@@ -1,0 +1,113 @@
+{
+  "project_info": {
+    "project_number": "815517670757",
+    "firebase_url": "https://dede-rides.firebaseio.com",
+    "project_id": "dede-rides",
+    "storage_bucket": "dede-rides.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815517670757:android:c0fa86effb84a789",
+        "android_client_info": {
+          "package_name": "com.firebaseapp.dede_rides.dederides"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "815517670757-i9e9p6ivvb7tnjphtfftu2jua1gvj58q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.firebaseapp.dede_rides.dederides",
+            "certificate_hash": "c973bc210748dff9d8de1b161d51f5202048882d"
+          }
+        },
+        {
+          "client_id": "815517670757-eudbo0jirj51a1snvv1hsme11hvfcj8o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl2IWzCvcNf7iZAug3StlzqHDAv88MoxA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "815517670757-ck95g44ncnjfkfm0hror4cje043l8302.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dede.ios.DedeRides"
+              }
+            },
+            {
+              "client_id": "815517670757-eudbo0jirj51a1snvv1hsme11hvfcj8o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815517670757:android:54eb2e9190ebd2e7",
+        "android_client_info": {
+          "package_name": "dederides.firebaseapp.com.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "815517670757-bel3jkqk3iee250v7rsnv27qqhi4hmo5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dederides.firebaseapp.com.myapplication",
+            "certificate_hash": "c973bc210748dff9d8de1b161d51f5202048882d"
+          }
+        },
+        {
+          "client_id": "815517670757-eudbo0jirj51a1snvv1hsme11hvfcj8o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl2IWzCvcNf7iZAug3StlzqHDAv88MoxA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "815517670757-ck95g44ncnjfkfm0hror4cje043l8302.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dede.ios.DedeRides"
+              }
+            },
+            {
+              "client_id": "815517670757-eudbo0jirj51a1snvv1hsme11hvfcj8o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
