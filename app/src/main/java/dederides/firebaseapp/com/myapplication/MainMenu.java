@@ -72,8 +72,27 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-        Toast.makeText(this, "Item " + i, Toast.LENGTH_LONG).show();
+        int ownedEventsLength = this.m_userModel.getOwnedEvents().size();
+        int savedEventsLength = this.m_userModel.getSavedEvents().size();
+        int drivesForLength = this.m_userModel.getDrivesFor().size();
+        String eventID;
 
+        if( i < ownedEventsLength ) {
+
+            eventID = this.m_userModel.getOwnedEvents().get( i ).eventID;
+            Toast.makeText(this, "Owned Event: " + eventID, Toast.LENGTH_LONG).show();
+
+        } else if( i < ownedEventsLength + savedEventsLength ) {
+
+            eventID = this.m_userModel.getSavedEvents().get( i - ownedEventsLength ).eventID;
+            Toast.makeText(this, "Saved Event: " + eventID, Toast.LENGTH_LONG).show();
+
+        } else if( i < ownedEventsLength + savedEventsLength + drivesForLength ) {
+
+            eventID = this.m_userModel.getDrivesFor().get( i - ownedEventsLength - savedEventsLength ).eventID;
+            Toast.makeText(this, "Drives For: " + eventID, Toast.LENGTH_LONG).show();
+            
+        }
     }
 
     /* List View Adapter *****************************************************/
