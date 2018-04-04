@@ -1,7 +1,5 @@
 package dederides.firebaseapp.com.myapplication.data.model;
 
-import android.widget.Toast;
-
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,6 +21,7 @@ public class UserModel {
 
     private ArrayList<OwnedEventEntry> m_ownedEvents;
     private ArrayList<SavedEventEntry> m_savedEvents;
+    private ArrayList<DrivesForEntry> m_drivesFor;
 
     public UserModel( FirebaseUser user, UserModelUpdateHandler handler ) {
 
@@ -59,6 +58,7 @@ public class UserModel {
         /* Initialize Database Populated Variables */
         this.m_ownedEvents = new ArrayList<>();
         this.m_savedEvents = new ArrayList<>();
+        this.m_drivesFor = new ArrayList<>();
 
         /* Add Event Listeners */
         m_userRef.child( "ownedEvents" ).addValueEventListener(
@@ -66,6 +66,9 @@ public class UserModel {
         );
         m_userRef.child( "savedEvents" ).addValueEventListener(
                 new SavedEventListener( this )
+        );
+        m_userRef.child( "drivesFor" ).addValueEventListener(
+                new DrivesForListener( this )
         );
     }
 
@@ -83,6 +86,10 @@ public class UserModel {
 
     public ArrayList<SavedEventEntry> getSavedEvents() {
         return m_savedEvents;
+    }
+
+    public ArrayList<DrivesForEntry> getDrivesFor() {
+        return m_drivesFor;
     }
 
     private UserModelUpdateHandler getHandler() {
@@ -176,6 +183,39 @@ public class UserModel {
             UserModelUpdateHandler handler = this.m_model.getHandler();
             if( handler != null)
                 handler.userSavedEventsUpdated();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private class DrivesForListener implements ValueEventListener {
+
+        private UserModel m_model;
+
+        DrivesForListener(UserModel model) {
+            this.m_model = model;
+        }
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            this.m_model.m_drivesFor.clear();
+
+            /* Add all entries from data base */
+            for (DataSnapshot drivesForEvent: dataSnapshot.getChildren()) {
+                this.m_model.m_drivesFor.add( new DrivesForEntry(
+                        drivesForEvent.getKey(),
+                        drivesForEvent.getValue( String.class )
+                ));
+            }
+
+            /* Alert Handler */
+            UserModelUpdateHandler handler = this.m_model.getHandler();
+            if( handler != null)
+                handler.userDrivesForUpdated();
         }
 
         @Override

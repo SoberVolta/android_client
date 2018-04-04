@@ -8,14 +8,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import dederides.firebaseapp.com.myapplication.data.model.UserModel;
 import dederides.firebaseapp.com.myapplication.data.model.UserModelUpdateHandler;
 
-public class MainMenu extends AppCompatActivity implements UserModelUpdateHandler {
+public class MainMenu extends AppCompatActivity implements UserModelUpdateHandler,
+        AdapterView.OnItemClickListener {
 
     public static final String USER_UID = "user_uid_key";
 
@@ -44,6 +47,7 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         this.m_listView = ( ListView ) findViewById( R.id.listView );
         this.m_listViewAdapter = new MainMenuAdapter( this );
         this.m_listView.setAdapter( this.m_listViewAdapter );
+        this.m_listView.setOnItemClickListener( this );
     }
 
     /* User Model Update Handler *********************************************/
@@ -56,6 +60,20 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
     @Override
     public void userSavedEventsUpdated() {
         this.m_listViewAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void userDrivesForUpdated() {
+        this.m_listViewAdapter.notifyDataSetChanged();
+    }
+
+    /* On Item Click Listener ************************************************/
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+        Toast.makeText(this, "Item " + i, Toast.LENGTH_LONG).show();
+
     }
 
     /* List View Adapter *****************************************************/
@@ -75,7 +93,8 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         @Override
         public int getCount() {
             return  this.m_mainMenu.m_userModel.getOwnedEvents().size() +
-                    this.m_mainMenu.m_userModel.getSavedEvents().size();
+                    this.m_mainMenu.m_userModel.getSavedEvents().size() +
+                    this.m_mainMenu.m_userModel.getDrivesFor().size();
         }
 
         @Override
@@ -95,6 +114,7 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
             View row = null;
             int ownedEventsLength = this.m_mainMenu.m_userModel.getOwnedEvents().size();
             int savedEventsLength = this.m_mainMenu.m_userModel.getSavedEvents().size();
+            int drivesForLength = this.m_mainMenu.m_userModel.getDrivesFor().size();
 
             LayoutInflater layoutInflater = LayoutInflater.from(this.m_context);
             row = layoutInflater.inflate(                                               // TODO: Fix
@@ -118,6 +138,14 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
                 lbl_rowType.setTextColor( 0xFFFFD700 );
 
                 lbl_rowTitle.setText(this.m_mainMenu.m_userModel.getSavedEvents().get(i - ownedEventsLength).eventName);
+
+            } else if ( i < ( ownedEventsLength + savedEventsLength + drivesForLength )) {
+
+                lbl_rowType.setText( "You Drive For" );
+                lbl_rowType.setTextColor( 0xFFFF0000 );
+
+                lbl_rowTitle.setText(this.m_mainMenu.m_userModel.getDrivesFor().get(i - ownedEventsLength - savedEventsLength).eventName);
+
             }
 
             return row;

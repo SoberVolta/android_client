@@ -6,4 +6,5 @@ public interface UserModelUpdateHandler {
 
     void userSavedEventsUpdated();
 
+    void userDrivesForUpdated();
 }
