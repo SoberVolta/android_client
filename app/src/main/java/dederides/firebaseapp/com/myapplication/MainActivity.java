@@ -15,6 +15,8 @@ import dederides.firebaseapp.com.myapplication.authentication.FacebookAuthHandle
 import dederides.firebaseapp.com.myapplication.authentication.FacebookAuthModel;
 import dederides.firebaseapp.com.myapplication.authentication.FirebaseAuthHandler;
 import dederides.firebaseapp.com.myapplication.authentication.FirebaseAuthModel;
+import dederides.firebaseapp.com.myapplication.data.model.UserModel;
+import dederides.firebaseapp.com.myapplication.data.model.UserModelUpdateHandler;
 
 /*                                                                                                   */
 /* Main Activity Components ***********************************************************************/
@@ -32,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements
     /* Authentication Model */
     private FacebookAuthModel facebookAuth;
     private FirebaseAuthModel firebaseAuth;
-
 
     /* Application Lifecycle *************************************************/
 
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements
         /* Inform user of error */
         Toast.makeText(
                 this,
-                "An Error Occurred. Please Restart The App.",
+                "A Facebook Error Occurred. Please Restart The App.",
                 Toast.LENGTH_LONG)
                 .show();
 
@@ -100,7 +101,12 @@ public class MainActivity extends AppCompatActivity implements
         if( newUser != null ) {
 
             this.setTitle( newUser.getDisplayName() );
+            UserModel userModel = new UserModel( newUser, null );
 
+            /* Switch Activity */
+            Intent switchActivityIntent = new Intent( this, MainMenu.class );
+            switchActivityIntent.putExtra( MainMenu.USER_UID, userModel.getUID() );
+            startActivity(switchActivityIntent);
 
         }
         /* Check if no user signed in */
@@ -116,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements
         /* Inform user of error */
         Toast.makeText(
                 this,
-                "An Error Occurred. Please Restart The App.",
+                "A Firebase Error Occurred. Please Restart The App.",
                 Toast.LENGTH_LONG)
                 .show();
 
