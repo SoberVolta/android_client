@@ -22,6 +22,7 @@ public class UserModel {
     private DatabaseReference m_userRef;
 
     private ArrayList<OwnedEventEntry> m_ownedEvents;
+    private ArrayList<SavedEventEntry> m_savedEvents;
 
     public UserModel( FirebaseUser user, UserModelUpdateHandler handler ) {
 
@@ -57,10 +58,14 @@ public class UserModel {
 
         /* Initialize Database Populated Variables */
         this.m_ownedEvents = new ArrayList<>();
+        this.m_savedEvents = new ArrayList<>();
 
         /* Add Event Listeners */
         m_userRef.child( "ownedEvents" ).addValueEventListener(
                 new OwnedEventListener( this )
+        );
+        m_userRef.child( "savedEvents" ).addValueEventListener(
+                new SavedEventListener( this )
         );
     }
 
@@ -74,6 +79,10 @@ public class UserModel {
 
     public ArrayList<OwnedEventEntry> getOwnedEvents() {
         return m_ownedEvents;
+    }
+
+    public ArrayList<SavedEventEntry> getSavedEvents() {
+        return m_savedEvents;
     }
 
     private UserModelUpdateHandler getHandler() {
@@ -134,6 +143,39 @@ public class UserModel {
             UserModelUpdateHandler handler = this.m_model.getHandler();
             if( handler != null)
                 handler.userOwnedEventsUpdated();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private class SavedEventListener implements ValueEventListener {
+
+        private UserModel m_model;
+
+        SavedEventListener(UserModel model) {
+            this.m_model = model;
+        }
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            this.m_model.m_savedEvents.clear();
+
+            /* Add all entries from data base */
+            for (DataSnapshot savedEvent: dataSnapshot.getChildren()) {
+                this.m_model.m_savedEvents.add( new SavedEventEntry(
+                        savedEvent.getKey(),
+                        savedEvent.getValue( String.class )
+                ));
+            }
+
+            /* Alert Handler */
+            UserModelUpdateHandler handler = this.m_model.getHandler();
+            if( handler != null)
+                handler.userSavedEventsUpdated();
         }
 
         @Override

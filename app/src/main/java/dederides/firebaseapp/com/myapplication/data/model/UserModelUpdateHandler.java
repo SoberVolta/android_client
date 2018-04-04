@@ -4,4 +4,6 @@ public interface UserModelUpdateHandler {
 
     void userOwnedEventsUpdated();
 
+    void userSavedEventsUpdated();
+
 }

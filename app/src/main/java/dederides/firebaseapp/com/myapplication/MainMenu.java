@@ -53,6 +53,11 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         this.m_listViewAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void userSavedEventsUpdated() {
+        this.m_listViewAdapter.notifyDataSetChanged();
+    }
+
     /* List View Adapter *****************************************************/
 
     private class MainMenuAdapter extends BaseAdapter {
@@ -69,7 +74,8 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
 
         @Override
         public int getCount() {
-            return this.m_mainMenu.m_userModel.getOwnedEvents().size();
+            return  this.m_mainMenu.m_userModel.getOwnedEvents().size() +
+                    this.m_mainMenu.m_userModel.getSavedEvents().size();
         }
 
         @Override
@@ -82,22 +88,37 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
             return i;
         }
 
+        @SuppressLint("ViewHolder")
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
 
-            LayoutInflater layoutInflater = LayoutInflater.from( this.m_context );
-            @SuppressLint("ViewHolder") View row = layoutInflater.inflate(              // TODO: Fix
+            View row = null;
+            int ownedEventsLength = this.m_mainMenu.m_userModel.getOwnedEvents().size();
+            int savedEventsLength = this.m_mainMenu.m_userModel.getSavedEvents().size();
+
+            LayoutInflater layoutInflater = LayoutInflater.from(this.m_context);
+            row = layoutInflater.inflate(                                               // TODO: Fix
                     R.layout.main_menu_listview_row,
                     viewGroup,
                     false
             );
+            TextView lbl_rowType = row.findViewById(R.id.lbl_rowType);
+            TextView lbl_rowTitle = row.findViewById(R.id.lbl_rowTitle);
 
-            TextView lbl_rowType = row.findViewById( R.id.lbl_rowType );
-            lbl_rowType.setText( "Your Event" );
-            lbl_rowType.setTextColor( R.attr.colorPrimary );
+            if( i < ownedEventsLength ) {
 
-            TextView lbl_rowTitle = row.findViewById( R.id.lbl_rowTitle );
-            lbl_rowTitle.setText( this.m_mainMenu.m_userModel.getOwnedEvents().get( i ).eventName );
+                lbl_rowType.setText("Your Event");
+                lbl_rowType.setTextColor(R.attr.colorPrimary);
+
+                lbl_rowTitle.setText(this.m_mainMenu.m_userModel.getOwnedEvents().get(i).eventName);
+
+            } else if ( i < ( ownedEventsLength + savedEventsLength )) {
+
+                lbl_rowType.setText( "Saved Event" );
+                lbl_rowType.setTextColor( 0xFFFFD700 );
+
+                lbl_rowTitle.setText(this.m_mainMenu.m_userModel.getSavedEvents().get(i - ownedEventsLength).eventName);
+            }
 
             return row;
         }
