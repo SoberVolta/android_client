@@ -14,8 +14,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import dederides.firebaseapp.com.myapplication.data.model.UserModel;
-import dederides.firebaseapp.com.myapplication.data.model.UserModelUpdateHandler;
+import dederides.firebaseapp.com.myapplication.data.model.user.UserModel;
+import dederides.firebaseapp.com.myapplication.data.model.user.UserModelUpdateHandler;
 
 public class MainMenu extends AppCompatActivity implements UserModelUpdateHandler,
         AdapterView.OnItemClickListener {

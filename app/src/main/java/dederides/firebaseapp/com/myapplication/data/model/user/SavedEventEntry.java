@@ -1,4 +1,4 @@
-package dederides.firebaseapp.com.myapplication.data.model;
+package dederides.firebaseapp.com.myapplication.data.model.user;
 
 public class SavedEventEntry {
 

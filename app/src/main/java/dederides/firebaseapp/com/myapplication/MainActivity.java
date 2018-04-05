@@ -15,8 +15,7 @@ import dederides.firebaseapp.com.myapplication.authentication.FacebookAuthHandle
 import dederides.firebaseapp.com.myapplication.authentication.FacebookAuthModel;
 import dederides.firebaseapp.com.myapplication.authentication.FirebaseAuthHandler;
 import dederides.firebaseapp.com.myapplication.authentication.FirebaseAuthModel;
-import dederides.firebaseapp.com.myapplication.data.model.UserModel;
-import dederides.firebaseapp.com.myapplication.data.model.UserModelUpdateHandler;
+import dederides.firebaseapp.com.myapplication.data.model.user.UserModel;
 
 /*                                                                                                   */
 /* Main Activity Components ***********************************************************************/
