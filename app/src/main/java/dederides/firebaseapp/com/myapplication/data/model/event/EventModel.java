@@ -22,6 +22,7 @@ public class EventModel {
     private String m_name;
     private String m_location;
     private String m_ownerUID;
+    private boolean m_disabled;
 
     private ArrayList<QueueEntry> m_queue;
     private ArrayList<ActiveRidesEntry> m_activeRides;
@@ -47,6 +48,7 @@ public class EventModel {
         this.m_name = "";
         this.m_location = "";
         this.m_ownerUID = "";
+        this.m_disabled = false;
         this.m_queue = new ArrayList<>();
         this.m_activeRides = new ArrayList<>();
         this.m_pendingDrivers = new ArrayList<>();
@@ -61,6 +63,9 @@ public class EventModel {
         );
         m_eventRef.child( "owner" ).addValueEventListener(
                 new EventOwnerValueListener( this )
+        );
+        m_eventRef.child( "disabled" ).addValueEventListener(
+                new EventDisabledValueListener( this )
         );
         m_eventRef.child( "queue" ).addValueEventListener(
                 new EventQueueValueListener( this )
@@ -88,6 +93,10 @@ public class EventModel {
 
     public String getLocation() {
         return m_location;
+    }
+
+    public boolean isDisabled() {
+        return m_disabled;
     }
 
     public String getOwnerUID() {
@@ -164,6 +173,32 @@ public class EventModel {
         public void onDataChange(DataSnapshot dataSnapshot) {
             m_model.m_ownerUID = dataSnapshot.getValue( String.class );
             m_model.m_handler.eventOwnerDidChange();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+
+    }
+
+    private class EventDisabledValueListener implements ValueEventListener {
+
+        EventModel m_model;
+
+        EventDisabledValueListener( EventModel model ) {
+            m_model = model;
+        }
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            if( dataSnapshot.getValue() == null ) {
+                return;
+            }
+
+            this.m_model.m_disabled = dataSnapshot.getValue( Boolean.class );
+            this.m_model.m_handler.eventDisabledDidChange();
         }
 
         @Override
