@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
+import dederides.firebaseapp.com.myapplication.data.model.OwnedEventEntry;
 import dederides.firebaseapp.com.myapplication.data.model.UserModel;
 import dederides.firebaseapp.com.myapplication.data.model.UserModelUpdateHandler;
 
@@ -18,6 +20,8 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
     private String m_userUID;
     private UserModel m_userModel;
     private String m_eventID;
+
+    private boolean m_userOwnsThisEvent;
 
     /* Application Lifecycle *************************************************/
 
@@ -35,7 +39,33 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
         this.m_userModel = new UserModel( this.m_userUID, this );
 
-        this.setTitle( this.m_eventID );
+        this.m_userOwnsThisEvent = false;
+    }
+
+    /* Button Press Handlers *************************************************/
+
+    public void onRequestRideClick( View view ) {
+
+    }
+
+    public void onOfferDriveClick( View view ) {
+
+    }
+
+    public void onCopyEventLinkClick( View view ) {
+
+    }
+
+    public void onViewDriveOffersClick( View view ) {
+
+    }
+
+    public void onDisableEventClick( View view ) {
+
+    }
+
+    public void onDeleteEventClick( View view ) {
+
     }
 
     /* User Model Event Handler **********************************************/
@@ -43,6 +73,14 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
     @Override
     public void userOwnedEventsUpdated() {
 
+        this.m_userOwnsThisEvent = false;
+
+        for (OwnedEventEntry ownedEvent: m_userModel.getOwnedEvents()) {
+            if ( ownedEvent.eventID.equals( this.m_eventID )) {
+                this.m_userOwnsThisEvent = true;
+                return;
+            }
+        }
     }
 
     @Override
