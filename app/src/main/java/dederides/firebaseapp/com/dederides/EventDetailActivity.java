@@ -26,8 +26,10 @@ import com.google.android.gms.location.LocationServices;
 import java.util.Set;
 
 import dederides.firebaseapp.com.dederides.data.model.event.ActiveRidesEntry;
+import dederides.firebaseapp.com.dederides.data.model.event.DriversEntry;
 import dederides.firebaseapp.com.dederides.data.model.event.EventModel;
 import dederides.firebaseapp.com.dederides.data.model.event.EventModelUpdateHandler;
+import dederides.firebaseapp.com.dederides.data.model.event.PendingDriversEntry;
 import dederides.firebaseapp.com.dederides.data.model.event.QueueEntry;
 import dederides.firebaseapp.com.dederides.data.model.user.RidesEntry;
 import dederides.firebaseapp.com.dederides.data.model.user.UserModel;
@@ -62,6 +64,8 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     private boolean m_userIsInQueue;
     private boolean m_userIsInActiveRide;
+    private boolean m_userHasOfferedDrive;
+    private boolean m_userIsActiveDriver;
 
     private FusedLocationProviderApi m_fusedLocationClient;
 
@@ -95,6 +99,8 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
         this.m_userIsInQueue = false;
         this.m_userIsInActiveRide = false;
+        this.m_userHasOfferedDrive = false;
+        this.m_userIsActiveDriver = false;
 
         this.m_fusedLocationClient = LocationServices.FusedLocationApi;
     }
@@ -133,17 +139,35 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     public void onRequestRideClick(View view) {
 
-        /* Display confirmation dialog */
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Request a Ride?");
-        builder.setMessage("Are you sure you want to request a ride to "
-                + this.m_eventModel.getName() + "?");
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            /* Do nothing on click */
-            @Override public void onClick(DialogInterface dialogInterface, int i) {}
-        });
-        builder.setPositiveButton("Request Ride", this.m_requstRideListener);
-        builder.create().show();
+        if( this.m_userIsInActiveRide ) {
+            return;
+        }
+
+        if( this.m_userIsInQueue ) {
+
+            // TODO: Complete
+            Toast.makeText(
+                    this,
+                    "Cancel Ride Offer",
+                    Toast.LENGTH_LONG
+            ).show();
+
+        } else {
+
+            /* Display confirmation dialog */
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Request a Ride?");
+            builder.setMessage("Are you sure you want to request a ride to "
+                    + this.m_eventModel.getName() + "?");
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /* Do nothing on click */
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                }
+            });
+            builder.setPositiveButton("Request Ride", this.m_requstRideListener);
+            builder.create().show();
+        }
     }
 
     private class OnRequestRideClickListener implements DialogInterface.OnClickListener {
@@ -207,6 +231,46 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     public void onOfferDriveClick( View view ) {
 
+        if ( this.m_userHasOfferedDrive ) {
+
+            Toast.makeText(
+                    this,
+                    "Cancel Drive Offer",
+                    Toast.LENGTH_LONG
+            ).show();
+
+        } else if ( this.m_userIsActiveDriver ) {
+
+            Toast.makeText(
+                    this,
+                    "Cancel Active Drive",
+                    Toast.LENGTH_LONG
+            ).show();
+
+        } else {
+
+            /* Display confirmation dialog */
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Offer to Drive?");
+            builder.setMessage("Are you sure you want to offer to drive for "
+                    + this.m_eventModel.getName() + "?");
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /* Do nothing on click */
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                }
+            });
+            builder.setPositiveButton("Offer to Drive", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    EventDetailActivity.this.m_eventModel.addDriveOffer(
+                            EventDetailActivity.this.m_userModel.getUID(),
+                            EventDetailActivity.this.m_userModel.getDisplayName()
+                    );
+                }
+            });
+            builder.create().show();
+        }
     }
 
     public void onCopyEventLinkClick( View view ) {
@@ -322,14 +386,45 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
         updateRequestRideUIElement();
     }
 
+    private void checkForUserDrivingForEvent() {
+
+        /* Assume user is not driving for event */
+        this.m_userHasOfferedDrive = false;
+        this.m_userIsActiveDriver = false;
+        this.btn_offerDrive.setTextColor( Color.BLACK );
+        this.btn_offerDrive.setText( "Offer to Drive" );
+
+        /* Check if this user has requested to drive */
+        for (PendingDriversEntry pendingDriver : this.m_eventModel.getPendingDrivers()) {
+            if( pendingDriver.driverUID.equals( this.m_userModel.getUID() )) {
+
+                this.m_userHasOfferedDrive = true;
+                this.btn_offerDrive.setTextColor( Color.RED );
+                this.btn_offerDrive.setText( "Cancel Drive Offer" );
+                return;
+            }
+        }
+
+        /* Check if user is active driver */
+        for (DriversEntry driver : this.m_eventModel.getDrivers()) {
+            if( driver.driverUID.equals( this.m_userModel.getUID() )) {
+
+                this.m_userIsActiveDriver = true;
+                this.btn_offerDrive.setTextColor( Color.RED );
+                this.btn_offerDrive.setText( "Cancel Drive Offer" );
+                return;
+            }
+        }
+    }
+
     @Override
     public void eventPendingDriversDidChange() {
-
+        checkForUserDrivingForEvent();
     }
 
     @Override
     public void eventDriversDidChange() {
-
+        checkForUserDrivingForEvent();
     }
 
     /* User Model Event Handler **********************************************/
