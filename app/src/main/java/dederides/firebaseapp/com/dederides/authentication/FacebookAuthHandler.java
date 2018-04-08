@@ -1,4 +1,4 @@
-package dederides.firebaseapp.com.myapplication.authentication;
+package dederides.firebaseapp.com.dederides.authentication;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookException;

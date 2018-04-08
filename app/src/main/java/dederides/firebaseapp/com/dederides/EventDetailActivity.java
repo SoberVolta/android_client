@@ -1,4 +1,4 @@
-package dederides.firebaseapp.com.myapplication;
+package dederides.firebaseapp.com.dederides;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -7,12 +7,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import dederides.firebaseapp.com.myapplication.data.model.event.EventModel;
-import dederides.firebaseapp.com.myapplication.data.model.event.EventModelUpdateHandler;
-import dederides.firebaseapp.com.myapplication.data.model.event.QueueEntry;
-import dederides.firebaseapp.com.myapplication.data.model.user.OwnedEventEntry;
-import dederides.firebaseapp.com.myapplication.data.model.user.UserModel;
-import dederides.firebaseapp.com.myapplication.data.model.user.UserModelUpdateHandler;
+import dederides.firebaseapp.com.dederides.data.model.event.EventModel;
+import dederides.firebaseapp.com.dederides.data.model.event.EventModelUpdateHandler;
+import dederides.firebaseapp.com.dederides.data.model.user.UserModel;
+import dederides.firebaseapp.com.dederides.data.model.user.UserModelUpdateHandler;
 
 public class EventDetailActivity extends AppCompatActivity implements UserModelUpdateHandler,
         EventModelUpdateHandler {

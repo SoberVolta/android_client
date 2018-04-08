@@ -1,4 +1,4 @@
-package dederides.firebaseapp.com.myapplication;
+package dederides.firebaseapp.com.dederides;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

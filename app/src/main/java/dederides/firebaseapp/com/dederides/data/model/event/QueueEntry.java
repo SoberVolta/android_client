@@ -1,4 +1,4 @@
-package dederides.firebaseapp.com.myapplication.data.model.event;
+package dederides.firebaseapp.com.dederides.data.model.event;
 
 public class QueueEntry {
     public String rideID;

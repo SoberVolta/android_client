@@ -1,4 +1,4 @@
-package dederides.firebaseapp.com.myapplication.data.model.user;
+package dederides.firebaseapp.com.dederides.data.model.user;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;

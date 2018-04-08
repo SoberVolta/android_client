@@ -1,4 +1,4 @@
-package dederides.firebaseapp.com.myapplication;
+package dederides.firebaseapp.com.dederides;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -11,11 +11,11 @@ import com.facebook.FacebookException;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.auth.FirebaseUser;
 
-import dederides.firebaseapp.com.myapplication.authentication.FacebookAuthHandler;
-import dederides.firebaseapp.com.myapplication.authentication.FacebookAuthModel;
-import dederides.firebaseapp.com.myapplication.authentication.FirebaseAuthHandler;
-import dederides.firebaseapp.com.myapplication.authentication.FirebaseAuthModel;
-import dederides.firebaseapp.com.myapplication.data.model.user.UserModel;
+import dederides.firebaseapp.com.dederides.authentication.FacebookAuthHandler;
+import dederides.firebaseapp.com.dederides.authentication.FacebookAuthModel;
+import dederides.firebaseapp.com.dederides.authentication.FirebaseAuthHandler;
+import dederides.firebaseapp.com.dederides.authentication.FirebaseAuthModel;
+import dederides.firebaseapp.com.dederides.data.model.user.UserModel;
 
 /*                                                                                                   */
 /* Main Activity Components ***********************************************************************/

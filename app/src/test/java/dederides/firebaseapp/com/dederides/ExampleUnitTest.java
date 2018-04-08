@@ -1,4 +1,4 @@
-package dederides.firebaseapp.com.myapplication;
+package dederides.firebaseapp.com.dederides;
 
 import org.junit.Test;
 
