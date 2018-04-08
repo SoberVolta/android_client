@@ -7,6 +7,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class UserModel {
@@ -22,6 +23,8 @@ public class UserModel {
     private ArrayList<OwnedEventEntry> m_ownedEvents;
     private ArrayList<SavedEventEntry> m_savedEvents;
     private ArrayList<DrivesForEntry> m_drivesFor;
+    private ArrayList<RidesEntry> m_rides;
+    private ArrayList<DrivesEntry> m_drives;
 
     public UserModel( FirebaseUser user, UserModelUpdateHandler handler ) {
 
@@ -59,6 +62,8 @@ public class UserModel {
         this.m_ownedEvents = new ArrayList<>();
         this.m_savedEvents = new ArrayList<>();
         this.m_drivesFor = new ArrayList<>();
+        this.m_rides = new ArrayList<>();
+        this.m_drives = new ArrayList<>();
 
         /* Add Event Listeners */
         m_userRef.child( "ownedEvents" ).addValueEventListener(
@@ -69,6 +74,12 @@ public class UserModel {
         );
         m_userRef.child( "drivesFor" ).addValueEventListener(
                 new DrivesForListener( this )
+        );
+        m_userRef.child( "rides" ).addValueEventListener(
+                new RidesEventListener( this )
+        );
+        m_userRef.child( "drives" ).addValueEventListener(
+                new DrivesEventListener( this )
         );
     }
 
@@ -94,6 +105,14 @@ public class UserModel {
 
     private UserModelUpdateHandler getHandler() {
         return this.m_handler;
+    }
+
+    public ArrayList<RidesEntry> getRides() {
+        return m_rides;
+    }
+
+    public ArrayList<DrivesEntry> getDrives() {
+        return m_drives;
     }
 
     private class CreateUserInDatabaseIfAbsent implements ValueEventListener {
@@ -222,5 +241,71 @@ public class UserModel {
         public void onCancelled(DatabaseError databaseError) {
 
         }
+    }
+
+    private class RidesEventListener implements ValueEventListener {
+
+        private UserModel m_model;
+
+        RidesEventListener(UserModel model) {
+            this.m_model = model;
+        }
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            this.m_model.m_rides.clear();
+
+            /* Add all entries from data base */
+            for (DataSnapshot rides: dataSnapshot.getChildren()) {
+                this.m_model.m_rides.add( new RidesEntry(
+                        rides.getKey(),
+                        rides.getValue( String.class )
+                ));
+            }
+
+            /* Alert Handler */
+            UserModelUpdateHandler handler = this.m_model.getHandler();
+            if( handler != null)
+                handler.userRidesUpdated();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+
+    }
+
+    private class DrivesEventListener implements ValueEventListener {
+
+        private UserModel m_model;
+
+        DrivesEventListener(UserModel model) {
+            this.m_model = model;
+        }
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            this.m_model.m_drives.clear();
+
+            /* Add all entries from data base */
+            for (DataSnapshot drives: dataSnapshot.getChildren()) {
+                this.m_model.m_drives.add( new DrivesEntry(
+                        drives.getKey(),
+                        drives.getValue( String.class )
+                ));
+            }
+
+            /* Alert Handler */
+            UserModelUpdateHandler handler = this.m_model.getHandler();
+            if( handler != null)
+                handler.userRidesUpdated();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+
     }
 }

@@ -7,4 +7,8 @@ public interface UserModelUpdateHandler {
     void userSavedEventsUpdated();
 
     void userDrivesForUpdated();
+
+    void userRidesUpdated();
+
+    void userDrivesUpdated();
 }
