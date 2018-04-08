@@ -131,6 +131,20 @@ public class EventModel {
 
     }
 
+    public void cancelPendingDriveOffer( String driverUID ) {
+        m_eventRef.child( "pendingDrivers" ).child( driverUID ).setValue( null );
+    }
+
+    public void removeDriverFromEvent( String driverUID ) {
+
+        Map<String, Object> updates = new HashMap<>( 2 );
+
+        updates.put( "/events/" + this.m_eventID + "/drivers/" + driverUID, null );
+        updates.put( "/users/" + driverUID + "/drivesFor/" + this.m_eventID, null );
+
+        this.m_ref.updateChildren( updates );
+    }
+
     public void enqueueNewRideRequest( String riderUID, double lat, double lon ) {
 
         String rideKey = m_ref.child( "rides" ).push().getKey();

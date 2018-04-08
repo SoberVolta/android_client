@@ -23,8 +23,6 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.Set;
-
 import dederides.firebaseapp.com.dederides.data.model.event.ActiveRidesEntry;
 import dederides.firebaseapp.com.dederides.data.model.event.DriversEntry;
 import dederides.firebaseapp.com.dederides.data.model.event.EventModel;
@@ -127,12 +125,9 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
                             "Unable to request ride. Location Services Required.",
                             Toast.LENGTH_LONG
                     ).show();
-
                 }
-
             }
         }
-
     }
 
     /* Button Press Handlers *************************************************/
@@ -247,21 +242,54 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     public void onOfferDriveClick( View view ) {
 
+        /* If user has already offered to drive */
         if ( this.m_userHasOfferedDrive ) {
 
-            Toast.makeText(
-                    this,
-                    "Cancel Drive Offer",
-                    Toast.LENGTH_LONG
-            ).show();
+             /* Display confirmation dialog */
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Cancel Drive Offer?");
+            builder.setMessage("Are you sure you don't want to drive for "
+                    + this.m_eventModel.getName() + "?");
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /* Do nothing on cancel */
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                }
+            });
+            builder.setPositiveButton("Cancel Drive Offer", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    EventDetailActivity.this.m_eventModel.cancelPendingDriveOffer(
+                            EventDetailActivity.this.m_userModel.getUID()
+                    );
+                }
+            });
+            builder.create().show();
 
-        } else if ( this.m_userIsActiveDriver ) {
+        }
+        /* If user is already an active driver */
+        else if ( this.m_userIsActiveDriver ) {
 
-            Toast.makeText(
-                    this,
-                    "Cancel Active Drive",
-                    Toast.LENGTH_LONG
-            ).show();
+            /* Display confirmation dialog */
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Cancel Drive Offer?");
+            builder.setMessage("Are you sure you want to stop driving for "
+                    + this.m_eventModel.getName() + "?");
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /* Do nothing on cancel */
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                }
+            });
+            builder.setPositiveButton("Stop Driving", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    EventDetailActivity.this.m_eventModel.removeDriverFromEvent(
+                            EventDetailActivity.this.m_userModel.getUID()
+                    );
+                }
+            });
+            builder.create().show();
 
         } else {
 
@@ -271,7 +299,7 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
             builder.setMessage("Are you sure you want to offer to drive for "
                     + this.m_eventModel.getName() + "?");
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                /* Do nothing on click */
+                /* Do nothing on cancel */
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                 }
