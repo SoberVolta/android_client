@@ -1,12 +1,27 @@
 package dederides.firebaseapp.com.dederides;
 
+import android.*;
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.Set;
 
@@ -23,6 +38,7 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     public static final String USER_UID = "user_uid_extra";
     public static final String EVENT_ID = "event_id_extra";
+    public static final int LOCATION_PERMISSION_CODE = 0;
 
     /* Member Variables ******************************************************/
 
@@ -42,8 +58,12 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
     private Button btn_disableEvent;
     private Button btn_deleteEvent;
 
+    private OnRequestRideClickListener m_requstRideListener;
+
     private boolean m_userIsInQueue;
     private boolean m_userIsInActiveRide;
+
+    private FusedLocationProviderApi m_fusedLocationClient;
 
     /* Application Lifecycle *************************************************/
 
@@ -56,29 +76,133 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        this.m_userUID = intent.getStringExtra( EventDetailActivity.USER_UID );
-        this.m_eventID = intent.getStringExtra( EventDetailActivity.EVENT_ID );
+        this.m_userUID = intent.getStringExtra(EventDetailActivity.USER_UID);
+        this.m_eventID = intent.getStringExtra(EventDetailActivity.EVENT_ID);
 
-        this.m_userModel = new UserModel( this.m_userUID, this );
-        this.m_eventModel = new EventModel( this.m_eventID, this );
+        this.m_userModel = new UserModel(this.m_userUID, this);
+        this.m_eventModel = new EventModel(this.m_eventID, this);
 
-        this.lbl_eventTitle = ( TextView ) findViewById( R.id.lbl_eventTitle );
-        this.lbl_eventLocation = ( TextView ) findViewById( R.id.lbl_eventLocation );
-        this.btn_requestRide = ( Button ) findViewById( R.id.btn_requestRide );
-        this.btn_offerDrive = ( Button ) findViewById( R.id.btn_offerDrive );
-        this.btn_copyEventLink = ( Button ) findViewById( R.id.btn_copyEventLink );
-        this.btn_viewDrivers = ( Button ) findViewById( R.id.btn_viewDriveOffers );
-        this.btn_disableEvent = ( Button ) findViewById( R.id.btn_disableEvent );
-        this.btn_deleteEvent = ( Button ) findViewById( R.id.btn_deleteEvent );
+        this.lbl_eventTitle = (TextView) findViewById(R.id.lbl_eventTitle);
+        this.lbl_eventLocation = (TextView) findViewById(R.id.lbl_eventLocation);
+        this.btn_requestRide = (Button) findViewById(R.id.btn_requestRide);
+        this.btn_offerDrive = (Button) findViewById(R.id.btn_offerDrive);
+        this.btn_copyEventLink = (Button) findViewById(R.id.btn_copyEventLink);
+        this.btn_viewDrivers = (Button) findViewById(R.id.btn_viewDriveOffers);
+        this.btn_disableEvent = (Button) findViewById(R.id.btn_disableEvent);
+        this.btn_deleteEvent = (Button) findViewById(R.id.btn_deleteEvent);
+
+        this.m_requstRideListener = new OnRequestRideClickListener( this );
 
         this.m_userIsInQueue = false;
         this.m_userIsInActiveRide = false;
+
+        this.m_fusedLocationClient = LocationServices.FusedLocationApi;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults
+    ) {
+        switch ( requestCode ) {
+            case LOCATION_PERMISSION_CODE: {
+
+                /* Check if permission was granted */
+                if( grantResults.length > 0
+                        && grantResults[ 0 ] == PackageManager.PERMISSION_GRANTED ) {
+
+                    this.m_requstRideListener.onClick(null, 0);
+
+                } else {
+
+                    Toast.makeText(
+                            this,
+                            "Unable to request ride. Location Services Required.",
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                }
+
+            }
+        }
+
     }
 
     /* Button Press Handlers *************************************************/
 
-    public void onRequestRideClick( View view ) {
+    public void onRequestRideClick(View view) {
 
+        /* Display confirmation dialog */
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Request a Ride?");
+        builder.setMessage("Are you sure you want to request a ride to "
+                + this.m_eventModel.getName() + "?");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            /* Do nothing on click */
+            @Override public void onClick(DialogInterface dialogInterface, int i) {}
+        });
+        builder.setPositiveButton("Request Ride", this.m_requstRideListener);
+        builder.create().show();
+    }
+
+    private class OnRequestRideClickListener implements DialogInterface.OnClickListener {
+
+        EventDetailActivity m_activity;
+
+        OnRequestRideClickListener( EventDetailActivity activity ) {
+            this.m_activity = activity;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+
+            /* Local Variables */
+            LocationManager locationManager;
+            Location location;
+
+            /* If location permission not granted */
+            if (ActivityCompat.checkSelfPermission(EventDetailActivity.this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                /* Async Request Permission */
+                ActivityCompat.requestPermissions(
+                        this.m_activity,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        EventDetailActivity.LOCATION_PERMISSION_CODE
+                );
+
+                /* Catch in onRequestPermissionResult */
+                return;
+            }
+
+            /* Get Users Location */
+            locationManager = ( (LocationManager) EventDetailActivity.this.getSystemService(
+                    EventDetailActivity.LOCATION_SERVICE
+            ) );
+
+            if (locationManager != null) {
+                location = locationManager.getLastKnownLocation( LocationManager.GPS_PROVIDER );
+
+                /* Enqueue new ride request */
+                this.m_activity.m_eventModel.enqueueNewRideRequest(
+                        this.m_activity.m_userModel.getUID(),
+                        location.getLatitude(),
+                        location.getLongitude()
+                );
+
+            } else {
+
+                /* Alert user of error */
+                Toast.makeText(
+                        EventDetailActivity.this,
+                        "Unable to request ride. Location Not Available.",
+                        Toast.LENGTH_LONG
+                ).show();
+            }
+        }
     }
 
     public void onOfferDriveClick( View view ) {
