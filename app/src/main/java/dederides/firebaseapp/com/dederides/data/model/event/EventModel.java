@@ -7,6 +7,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EventModel {
 
@@ -117,6 +119,25 @@ public class EventModel {
 
     public ArrayList<DriversEntry> getDrivers() {
         return m_drivers;
+    }
+
+    public void enqueueNewRideRequest( String riderUID, double lat, double lon ) {
+
+        String rideKey = m_ref.child( "rides" ).push().getKey();
+        Map<String, Object> rideData = new HashMap<>();
+        Map<String, Object> updates = new HashMap<>();
+
+        rideData.put( "status", 0 );
+        rideData.put( "rider", riderUID );
+        rideData.put( "event", this.m_eventID );
+        rideData.put( "latitude", lat );
+        rideData.put( "longitude", lon );
+
+        updates.put( "/rides/" + rideKey, rideData );
+        updates.put( "/events/" + this.m_eventID + "/queue/" + rideKey, riderUID );
+        updates.put( "/users/" + riderUID + "/rides/" + rideKey, this.m_name );
+
+        this.m_ref.updateChildren( updates );
     }
 
     /* Database Value Listeners **********************************************/
