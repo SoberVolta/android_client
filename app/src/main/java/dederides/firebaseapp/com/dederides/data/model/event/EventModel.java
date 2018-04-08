@@ -4,6 +4,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -146,6 +148,65 @@ public class EventModel {
         updates.put( "/users/" + riderUID + "/rides/" + rideKey, this.m_name );
 
         this.m_ref.updateChildren( updates );
+    }
+
+    public void cancelRideRequest( String riderUID ) {
+
+        CancelRideRequestTransactionHandler transactionHandler
+                = new CancelRideRequestTransactionHandler( riderUID );
+        this.m_eventRef.child( "queue" ).runTransaction( transactionHandler );
+
+    }
+
+    private class CancelRideRequestTransactionHandler implements Transaction.Handler {
+
+        private String m_cancelingRiderUID;
+
+        CancelRideRequestTransactionHandler( String riderUID ) {
+            this.m_cancelingRiderUID = riderUID;
+        }
+
+        @Override
+        public Transaction.Result doTransaction(MutableData mutableData) {
+
+            /* Local Variables */
+            String queuedRiderUID;
+            String canceledRideID = null;
+            Map<String, Object> updates = new HashMap<>( 2);
+
+            /* For each rider in queue */
+            for (MutableData queueEntry: mutableData.getChildren()) {
+
+                /* If the rider in queue is the canceling rider */
+                queuedRiderUID = queueEntry.getValue( String.class );
+                if ( queuedRiderUID.equals( this.m_cancelingRiderUID ) ) {
+
+                    /* Remove that ride from queue */
+                    canceledRideID = queueEntry.getKey();
+                    mutableData.child( canceledRideID ).setValue( null );
+                    break;
+                }
+            }
+
+            /* If rider was in queue */
+            if ( canceledRideID != null ) {
+
+                /* Update database to remove ride */
+                updates.put( "/rides/" + canceledRideID, null );
+                updates.put( "/users/" + this.m_cancelingRiderUID + "/rides/" + canceledRideID,
+                             null
+                );
+
+                FirebaseDatabase.getInstance().getReference().updateChildren( updates );
+            }
+
+            return Transaction.success( mutableData );
+        }
+
+        @Override
+        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+        }
     }
 
     /* Database Value Listeners **********************************************/

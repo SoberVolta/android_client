@@ -145,12 +145,28 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
         if( this.m_userIsInQueue ) {
 
-            // TODO: Complete
-            Toast.makeText(
-                    this,
-                    "Cancel Ride Offer",
-                    Toast.LENGTH_LONG
-            ).show();
+            /* Display confirmation dialog */
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Cancel Ride Request?");
+            builder.setMessage("Are you don't want a ride to "
+                    + this.m_eventModel.getName() + "?");
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /* Do nothing on cancel */
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                }
+            });
+            builder.setPositiveButton("Cancel Ride", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    EventDetailActivity.this.m_eventModel.cancelRideRequest(
+                            EventDetailActivity.this.m_userModel.getUID()
+                    );
+
+                }
+            });
+            builder.create().show();
 
         } else {
 
@@ -160,7 +176,7 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
             builder.setMessage("Are you sure you want to request a ride to "
                     + this.m_eventModel.getName() + "?");
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                /* Do nothing on click */
+                /* Do nothing on cancel */
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                 }
