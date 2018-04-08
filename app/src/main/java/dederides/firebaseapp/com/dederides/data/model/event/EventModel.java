@@ -121,6 +121,14 @@ public class EventModel {
         return m_drivers;
     }
 
+    public void addDriveOffer(String potentialDriverUID, String potentialDriverDisplayName ) {
+
+        this.m_eventRef.child( "pendingDrivers" ).child( potentialDriverUID ).setValue(
+                potentialDriverDisplayName
+        );
+
+    }
+
     public void enqueueNewRideRequest( String riderUID, double lat, double lon ) {
 
         String rideKey = m_ref.child( "rides" ).push().getKey();
