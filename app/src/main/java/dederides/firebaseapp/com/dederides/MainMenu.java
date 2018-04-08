@@ -67,6 +67,16 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         this.m_listViewAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void userRidesUpdated() {
+
+    }
+
+    @Override
+    public void userDrivesUpdated() {
+
+    }
+
     /* On Item Click Listener ************************************************/
 
     @Override

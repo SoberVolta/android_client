@@ -1,14 +1,20 @@
 package dederides.firebaseapp.com.dederides;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Set;
+
+import dederides.firebaseapp.com.dederides.data.model.event.ActiveRidesEntry;
 import dederides.firebaseapp.com.dederides.data.model.event.EventModel;
 import dederides.firebaseapp.com.dederides.data.model.event.EventModelUpdateHandler;
+import dederides.firebaseapp.com.dederides.data.model.event.QueueEntry;
+import dederides.firebaseapp.com.dederides.data.model.user.RidesEntry;
 import dederides.firebaseapp.com.dederides.data.model.user.UserModel;
 import dederides.firebaseapp.com.dederides.data.model.user.UserModelUpdateHandler;
 
@@ -29,10 +35,15 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
     /* UI Elements */
     private TextView lbl_eventTitle;
     private TextView lbl_eventLocation;
+    private Button btn_requestRide;
+    private Button btn_offerDrive;
     private Button btn_copyEventLink;
     private Button btn_viewDrivers;
     private Button btn_disableEvent;
     private Button btn_deleteEvent;
+
+    private boolean m_userIsInQueue;
+    private boolean m_userIsInActiveRide;
 
     /* Application Lifecycle *************************************************/
 
@@ -53,11 +64,15 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
         this.lbl_eventTitle = ( TextView ) findViewById( R.id.lbl_eventTitle );
         this.lbl_eventLocation = ( TextView ) findViewById( R.id.lbl_eventLocation );
+        this.btn_requestRide = ( Button ) findViewById( R.id.btn_requestRide );
+        this.btn_offerDrive = ( Button ) findViewById( R.id.btn_offerDrive );
         this.btn_copyEventLink = ( Button ) findViewById( R.id.btn_copyEventLink );
         this.btn_viewDrivers = ( Button ) findViewById( R.id.btn_viewDriveOffers );
         this.btn_disableEvent = ( Button ) findViewById( R.id.btn_disableEvent );
         this.btn_deleteEvent = ( Button ) findViewById( R.id.btn_deleteEvent );
 
+        this.m_userIsInQueue = false;
+        this.m_userIsInActiveRide = false;
     }
 
     /* Button Press Handlers *************************************************/
@@ -138,14 +153,49 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
         }
     }
 
+    private void updateRequestRideUIElement() {
+
+        /* Assume user is not in queue or active ride */
+        this.m_userIsInQueue = false;
+        this.m_userIsInActiveRide = false;
+        this.btn_requestRide.setEnabled( true );
+        this.btn_requestRide.setText( "Request a Ride" );
+        this.btn_requestRide.setTextColor( Color.BLACK );
+
+        /* Check if rider is in queue */
+        for (QueueEntry queueEntry : this.m_eventModel.getQueue()) {
+            if( queueEntry.riderUID.equals( this.m_userModel.getUID() ) ) {
+
+                this.m_userIsInQueue = true;
+                this.btn_requestRide.setText( "Cancel Ride Request" );
+                this.btn_requestRide.setTextColor( Color.RED );
+                return;
+            }
+        }
+
+        /* Check if rider is in an active ride */
+        for (ActiveRidesEntry activeRide : this.m_eventModel.getActiveRides()) {
+            for (RidesEntry userRide : this.m_userModel.getRides() ) {
+                if ( activeRide.rideID.equals( userRide.rideID )) {
+
+                    this.m_userIsInActiveRide = true;
+                    this.btn_requestRide.setEnabled( false );
+                    this.btn_requestRide.setTextColor( Color.GRAY );
+                    return;
+
+                }
+            }
+        }
+    }
+
     @Override
     public void eventQueueDidChange() {
-
+        updateRequestRideUIElement();
     }
 
     @Override
     public void eventActiveRidesDidChange() {
-
+        updateRequestRideUIElement();
     }
 
     @Override
@@ -172,6 +222,16 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     @Override
     public void userDrivesForUpdated() {
+
+    }
+
+    @Override
+    public void userRidesUpdated() {
+        updateRequestRideUIElement();
+    }
+
+    @Override
+    public void userDrivesUpdated() {
 
     }
 }
