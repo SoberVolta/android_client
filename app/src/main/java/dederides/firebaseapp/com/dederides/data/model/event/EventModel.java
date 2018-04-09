@@ -1,5 +1,6 @@
 package dederides.firebaseapp.com.dederides.data.model.event;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -71,6 +72,27 @@ public class EventModel {
         m_eventRef.child( "disabled" ).addValueEventListener(
                 new EventDisabledValueListener( this )
         );
+        m_eventRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                if( dataSnapshot.getKey().equals( "disabled" ) ) {
+                    EventModel.this.m_disabled = false;
+                    EventModel.this.m_handler.eventDisabledDidChange();
+                }
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
         m_eventRef.child( "queue" ).addValueEventListener(
                 new EventQueueValueListener( this )
         );
@@ -221,6 +243,24 @@ public class EventModel {
         public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
 
         }
+    }
+
+    public void enableEvent() {
+
+        if ( !this.isDisabled() ) {
+            return;
+        }
+
+        this.m_eventRef.child( "disabled" ).setValue( null );
+    }
+
+    public void disableEvent() {
+
+        if ( this.isDisabled() ) {
+            return;
+        }
+
+        this.m_eventRef.child( "disabled" ).setValue( true );
     }
 
     /* Database Value Listeners **********************************************/

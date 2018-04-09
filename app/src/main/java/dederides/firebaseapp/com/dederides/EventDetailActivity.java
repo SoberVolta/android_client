@@ -343,6 +343,12 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     public void onDisableEventClick( View view ) {
 
+        if ( this.m_eventModel.isDisabled() ) {
+            this.m_eventModel.enableEvent();
+        } else {
+            this.m_eventModel.disableEvent();
+        }
+
     }
 
     public void onDeleteEventClick( View view ) {
