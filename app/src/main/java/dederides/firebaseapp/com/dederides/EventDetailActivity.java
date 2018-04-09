@@ -1,7 +1,8 @@
 package dederides.firebaseapp.com.dederides;
 
-import android.*;
 import android.Manifest;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -319,6 +319,22 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     public void onCopyEventLinkClick( View view ) {
 
+        /* Copy Link to Clipboard */
+        ClipboardManager clipboard
+                = ( ClipboardManager ) getSystemService(Context.CLIPBOARD_SERVICE );
+        ClipData clip = ClipData.newPlainText(
+                "",
+                "http://dede-rides.firebaseapp.com/event/index.html?id="
+                        + this.m_eventModel.getEventID()
+        );
+        clipboard.setPrimaryClip(clip);
+
+        /* Alert User */
+        Toast.makeText(
+                this,
+                "Link Copied to Clipboard",
+                Toast.LENGTH_LONG
+        ).show();
     }
 
     public void onViewDriveOffersClick( View view ) {
