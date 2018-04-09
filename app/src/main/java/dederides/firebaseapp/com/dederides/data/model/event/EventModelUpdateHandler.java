@@ -9,4 +9,5 @@ public interface EventModelUpdateHandler {
     void eventActiveRidesDidChange();
     void eventPendingDriversDidChange();
     void eventDriversDidChange();
+    void eventDeleted();
 }

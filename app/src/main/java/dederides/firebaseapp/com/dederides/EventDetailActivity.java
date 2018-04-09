@@ -353,6 +353,27 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
 
     public void onDeleteEventClick( View view ) {
 
+        /* Display confirmation dialog */
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Event?");
+        builder.setMessage("Are you sure you want to delete "
+                + this.m_eventModel.getName() + "?");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            /* Do nothing on cancel */
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                EventDetailActivity.this.m_eventModel.removeDriverFromEvent(
+                        EventDetailActivity.this.m_userModel.getUID()
+                );
+            }
+        });
+        builder.create().show();
+
     }
 
     /* Event Model Update Handler ********************************************/
@@ -491,6 +512,11 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
     @Override
     public void eventDriversDidChange() {
         checkForUserDrivingForEvent();
+    }
+
+    @Override
+    public void eventDeleted() {
+        onBackPressed();
     }
 
     /* User Model Event Handler **********************************************/

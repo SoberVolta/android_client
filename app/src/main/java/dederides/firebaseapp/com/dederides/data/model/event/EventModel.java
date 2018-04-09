@@ -105,6 +105,26 @@ public class EventModel {
         m_eventRef.child( "drivers" ).addValueEventListener(
                 new DriversValueListener( this )
         );
+        m_ref.child( "events" ).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                if( dataSnapshot.getKey().equals( EventModel.this.getEventID() )) {
+                    EventModel.this.m_handler.eventDeleted();
+                }
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
     /* Accessors *************************************************************/
@@ -261,6 +281,13 @@ public class EventModel {
         }
 
         this.m_eventRef.child( "disabled" ).setValue( true );
+    }
+
+    public void deleteEvent() {
+
+        // TODO: Queue, Active Rides, Pending Drivers, Active Drivers
+
+        this.m_ref.child( "events" ).child( this.m_eventID ).setValue( null );
     }
 
     /* Database Value Listeners **********************************************/
