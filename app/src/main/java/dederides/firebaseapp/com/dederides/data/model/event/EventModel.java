@@ -21,7 +21,7 @@ public class EventModel {
 
     private String m_eventID;
 
-    private DatabaseReference m_ref = FirebaseDatabase.getInstance().getReference();
+    private static DatabaseReference m_ref = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference m_eventRef;
 
     private String m_name;
@@ -129,6 +129,28 @@ public class EventModel {
 
     /* Accessors *************************************************************/
 
+    public static boolean createEvent( String eventName, String eventLocation, String ownerUID ) {
+
+        if( eventName.length() == 0 || eventLocation.length() == 0 || ownerUID.length() == 0 ) {
+            return false;
+        }
+
+        Map<String, Object> updates = new HashMap<>(2 );
+        Map<String, Object> eventData = new HashMap<>( 2 );
+        String newEventKey = EventModel.m_ref.child( "events" ).push().getKey();
+
+        eventData.put( "name", eventName );
+        eventData.put( "location", eventLocation );
+        eventData.put( "owner", ownerUID );
+
+        updates.put( "/events/" + newEventKey, eventData );
+        updates.put( "/users/" + ownerUID + "/ownedEvents/" + newEventKey, eventName );
+
+        EventModel.m_ref.updateChildren( updates );
+
+        return true;
+    }
+
     public String getEventID() {
         return m_eventID;
     }
@@ -184,7 +206,7 @@ public class EventModel {
         updates.put( "/events/" + this.m_eventID + "/drivers/" + driverUID, null );
         updates.put( "/users/" + driverUID + "/drivesFor/" + this.m_eventID, null );
 
-        this.m_ref.updateChildren( updates );
+        EventModel.m_ref.updateChildren( updates );
     }
 
     public void enqueueNewRideRequest( String riderUID, double lat, double lon ) {
@@ -203,7 +225,7 @@ public class EventModel {
         updates.put( "/events/" + this.m_eventID + "/queue/" + rideKey, riderUID );
         updates.put( "/users/" + riderUID + "/rides/" + rideKey, this.m_name );
 
-        this.m_ref.updateChildren( updates );
+        EventModel.m_ref.updateChildren( updates );
     }
 
     public void cancelRideRequest( String riderUID ) {
@@ -287,7 +309,7 @@ public class EventModel {
 
         this.m_eventRef.runTransaction( new DeleteEventTransactionHandler( this.m_eventID ) );
 
-        this.m_ref.child( "events" ).child( this.m_eventID ).setValue( null );
+        EventModel.m_ref.child( "events" ).child( this.m_eventID ).setValue( null );
     }
 
     private class DeleteEventTransactionHandler implements Transaction.Handler {
@@ -400,7 +422,7 @@ public class EventModel {
         updates.put( "/events/" + this.m_eventID + "/drivers/" + driverUID, driverDisplayName );
         updates.put( "/users/" + driverUID + "/drivesFor/" + this.m_eventID, this.m_name );
 
-        this.m_ref.updateChildren( updates );
+        EventModel.m_ref.updateChildren( updates );
     }
 
     /* Database Value Listeners **********************************************/

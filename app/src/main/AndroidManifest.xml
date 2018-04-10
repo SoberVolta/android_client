@@ -56,8 +56,9 @@
         <activity
             android:name=".MainMenu"
             android:launchMode="singleTop" />
-
-        <activity android:name=".EventDetailActivity" android:launchMode="singleTop">
+        <activity
+            android:name=".EventDetailActivity"
+            android:launchMode="singleTop">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -65,10 +66,15 @@
                 android:value="dederides.firebaseapp.com.dederides.MainMenu" />
         </activity>
         <activity android:name=".ViewDriversActivity">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="dederides.firebaseapp.com.dederides.EventDetailActivity" />
+        </activity>
+
+        <activity android:name=".CreateEventActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="dederides.firebaseapp.com.dederides.MainMenu" />
         </activity>
     </application>
 

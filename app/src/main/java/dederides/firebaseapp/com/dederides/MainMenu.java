@@ -66,11 +66,9 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         switch (item.getItemId()) {
             case R.id.item_create:
 
-                Toast.makeText(
-                        this,
-                        "Create Event",
-                        Toast.LENGTH_LONG
-                ).show();
+                Intent switchToCreateEvent = new Intent( this, CreateEventActivity.class );
+                switchToCreateEvent.putExtra( CreateEventActivity.USER_UID_EXTRA, this.m_userUID );
+                startActivity( switchToCreateEvent );
 
                 return true;
             default:
