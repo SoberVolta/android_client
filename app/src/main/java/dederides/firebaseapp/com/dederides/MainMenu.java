@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -48,6 +51,31 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         this.m_listViewAdapter = new MainMenuAdapter( this );
         this.m_listView.setAdapter( this.m_listViewAdapter );
         this.m_listView.setOnItemClickListener( this );
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.item_create:
+
+                Toast.makeText(
+                        this,
+                        "Create Event",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /* User Model Update Handler *********************************************/
