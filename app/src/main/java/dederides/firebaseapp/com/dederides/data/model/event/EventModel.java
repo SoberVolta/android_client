@@ -290,6 +290,21 @@ public class EventModel {
         this.m_ref.child( "events" ).child( this.m_eventID ).setValue( null );
     }
 
+    public void rejectPendingRideOffer( String driverUID ) {
+        this.m_eventRef.child( "pendingDrivers" ).child( driverUID ).setValue( null );
+    }
+
+    public void acceptDriveOffer( String driverUID, String driverDisplayName ) {
+
+        Map<String, Object> updates = new HashMap<>( 3 );
+
+        updates.put( "/events/" + this.m_eventID + "/pendingDrivers/" + driverUID, null );
+        updates.put( "/events/" + this.m_eventID + "/drivers/" + driverUID, driverDisplayName );
+        updates.put( "/users/" + driverUID + "/drivesFor/" + this.m_eventID, this.m_name );
+
+        this.m_ref.updateChildren( updates );
+    }
+
     /* Database Value Listeners **********************************************/
 
     private class EventNameValueListener implements ValueEventListener {

@@ -65,8 +65,6 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
     private boolean m_userHasOfferedDrive;
     private boolean m_userIsActiveDriver;
 
-    private FusedLocationProviderApi m_fusedLocationClient;
-
     /* Application Lifecycle *************************************************/
 
     @Override
@@ -99,8 +97,6 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
         this.m_userIsInActiveRide = false;
         this.m_userHasOfferedDrive = false;
         this.m_userIsActiveDriver = false;
-
-        this.m_fusedLocationClient = LocationServices.FusedLocationApi;
     }
 
     @Override
@@ -338,6 +334,12 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
     }
 
     public void onViewDriveOffersClick( View view ) {
+
+        Intent viewDriversIntent = new Intent( this, ViewDriversActivity.class );
+        viewDriversIntent.putExtra(
+                ViewDriversActivity.EVENT_ID_EXTRA, this.m_eventModel.getEventID()
+        );
+        startActivity( viewDriversIntent );
 
     }
 
