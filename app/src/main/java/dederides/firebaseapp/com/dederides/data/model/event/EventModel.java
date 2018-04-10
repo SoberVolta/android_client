@@ -285,9 +285,107 @@ public class EventModel {
 
     public void deleteEvent() {
 
-        // TODO: Queue, Active Rides, Pending Drivers, Active Drivers
+        this.m_eventRef.runTransaction( new DeleteEventTransactionHandler( this.m_eventID ) );
 
         this.m_ref.child( "events" ).child( this.m_eventID ).setValue( null );
+    }
+
+    private class DeleteEventTransactionHandler implements Transaction.Handler {
+
+        private String m_eventID;
+
+        DeleteEventTransactionHandler( String eventID ) {
+            this.m_eventID = eventID;
+        }
+
+        @Override
+        public Transaction.Result doTransaction(MutableData mutableData) {
+
+            if ( mutableData == null || mutableData.getValue() == null ) {
+                return Transaction.success( mutableData );
+            }
+
+            Map<String, Object> updates = new HashMap<>();
+            MutableData queueData;
+            MutableData activeRidesData;
+            MutableData activeDriversData;
+            String rideID;
+            String riderUID;
+            String driverUID;
+            String ownerUID;
+
+            /* Delete Queue */
+            queueData = mutableData.child( "queue" );
+            for ( MutableData queueEntry: queueData.getChildren()) {
+
+                /* Get data from queue entry */
+                rideID = queueEntry.getKey();
+                riderUID = queueEntry.getValue( String.class );
+
+                /* Delete ride */
+                updates.put( "/rides/" + rideID, null );
+
+                /* Remove ride from user's space */
+                updates.put( "/users/" + riderUID + "/rides/" + rideID, null );
+            }
+
+            /* Delete Active Rides */
+            activeRidesData = mutableData.child( "activeRides" );
+            for (MutableData activeRideEntry : activeRidesData.getChildren()) {
+
+                /* Get data from active ride entry */
+                rideID = activeRideEntry.getKey();
+                driverUID = activeRideEntry.getValue( String.class );
+
+                /* Remove ride from driver's space */
+                updates.put( "/users/" + driverUID + "/drives/" + rideID, null );
+
+                /* Remove ride in rider's space and ride space */
+                FirebaseDatabase.getInstance().getReference().child( "rides" ).child( rideID )
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        Map<String, Object> updates = new HashMap<>( 2 );
+                        String rideID = dataSnapshot.getKey();
+                        String riderUID = dataSnapshot.child( "rider" ).getValue( String.class );
+
+                        /* Delete ride from rides space and from rider's rides space */
+                        updates.put( "/rides/" + rideID, null );
+                        updates.put( "/users/" + riderUID + "/rides/" + rideID, null );
+
+                        FirebaseDatabase.getInstance().getReference().updateChildren( updates );
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+
+            /* Delete Active Drivers */
+            activeDriversData = mutableData.child( "drivers" );
+            for (MutableData activeDriverEntry : activeDriversData.getChildren()) {
+                driverUID = activeDriverEntry.getKey();
+
+                /* Remove drivesFor entry in driver's space */
+                updates.put( "/users/" + driverUID + "/drivesFor/" + m_eventID, null );
+            }
+
+            /* Delete from owner's space */
+            ownerUID = mutableData.child( "owner" ).getValue( String.class );
+            updates.put( "/users/" + ownerUID + "/ownedEvents/" + m_eventID, null );
+
+            /* Update Other spaces */
+            FirebaseDatabase.getInstance().getReference().updateChildren( updates );
+
+            /* Delete this space */
+            return Transaction.success( null );
+        }
+
+        @Override
+        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+        }
     }
 
     public void rejectPendingRideOffer( String driverUID ) {

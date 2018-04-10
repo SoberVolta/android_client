@@ -369,9 +369,7 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
         builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                EventDetailActivity.this.m_eventModel.removeDriverFromEvent(
-                        EventDetailActivity.this.m_userModel.getUID()
-                );
+                EventDetailActivity.this.m_eventModel.deleteEvent();
             }
         });
         builder.create().show();
