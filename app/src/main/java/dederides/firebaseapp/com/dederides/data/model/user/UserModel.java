@@ -76,6 +76,9 @@ public class UserModel {
         this.m_drives = new ArrayList<>();
 
         /* Add Event Listeners */
+        m_userRef.child( "displayName" ).addValueEventListener(
+                new DisplayNameListener()
+        );
         m_userRef.child( "ownedEvents" ).addValueEventListener(
                 new OwnedEventListener( this )
         );
@@ -158,6 +161,18 @@ public class UserModel {
                 }
             }
 
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private class DisplayNameListener implements ValueEventListener {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            UserModel.this.m_displayName = dataSnapshot.getValue( String.class );
         }
 
         @Override
