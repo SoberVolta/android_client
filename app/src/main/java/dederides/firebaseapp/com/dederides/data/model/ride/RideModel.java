@@ -1,9 +1,12 @@
 package dederides.firebaseapp.com.dederides.data.model.ride;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
@@ -56,7 +59,7 @@ public class RideModel {
         this.m_rideRef.child( "longitude" ).addValueEventListener(
                 new LongitudeListener( this )
         );
-
+        m_ref.child( "rides" ).addChildEventListener( new RideRemovedListener() );
     }
 
     /* Accessors *************************************************************/
@@ -98,7 +101,92 @@ public class RideModel {
         RideModel.m_ref.updateChildren( updates );
     }
 
+    public void cancelRideRequest() {
+
+        CancelRideRequestTransactionHandler transactionHandler
+                = new CancelRideRequestTransactionHandler( this.m_riderUID );
+        m_ref.child( "events" ).child( this.m_eventID ).child( "queue" ).runTransaction(
+            transactionHandler
+        );
+
+    }
+
+    private class CancelRideRequestTransactionHandler implements Transaction.Handler {
+
+        private String m_cancelingRiderUID;
+        String m_canceledRideID;
+
+        CancelRideRequestTransactionHandler( String riderUID ) {
+            this.m_cancelingRiderUID = riderUID;
+        }
+
+        @Override
+        public Transaction.Result doTransaction(MutableData mutableData) {
+
+            /* Local Variables */
+            String queuedRiderUID;
+
+            m_canceledRideID = null;
+
+            /* For each rider in queue */
+            for (MutableData queueEntry: mutableData.getChildren()) {
+
+                /* If the rider in queue is the canceling rider */
+                queuedRiderUID = queueEntry.getValue( String.class );
+                if ( queuedRiderUID.equals( this.m_cancelingRiderUID ) ) {
+
+                    /* Remove that ride from queue */
+                    m_canceledRideID = queueEntry.getKey();
+                    mutableData.child( m_canceledRideID ).setValue( null );
+                    break;
+                }
+            }
+
+            return Transaction.success( mutableData );
+        }
+
+        @Override
+        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+            Map<String, Object> updates;
+
+            if ( m_canceledRideID != null ) {
+
+                updates = new HashMap<>( 2);
+
+                /* Update database to remove ride */
+                updates.put( "/rides/" + m_canceledRideID, null );
+                updates.put( "/users/" + this.m_cancelingRiderUID + "/rides/" + m_canceledRideID,
+                        null
+                );
+
+                FirebaseDatabase.getInstance().getReference().updateChildren( updates );
+            }
+        }
+    }
+
     /* Database Listeners ****************************************************/
+
+    private class RideRemovedListener implements ChildEventListener {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        }
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        }
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            if( dataSnapshot.getKey().equals( RideModel.this.m_rideID )) {
+                RideModel.this.m_handler.rideWasRemoved();
+            }
+        }
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+        }
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+        }
+    }
 
     private class EventListener implements ValueEventListener {
 

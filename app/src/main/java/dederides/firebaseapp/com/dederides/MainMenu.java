@@ -113,6 +113,8 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         int drivesForLength = this.m_userModel.getDrivesFor().size();
         int ridesLength = this.m_userModel.getRides().size();
         String eventID;
+        String rideID;
+        String eventName;
 
         if( i < ownedEventsLength ) {
 
@@ -152,13 +154,17 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
 
         } else if ( i < ownedEventsLength + savedEventsLength + drivesForLength + ridesLength ) {
 
-            Toast.makeText(
-                    this,
-                    "RideID: " + m_userModel.getRides().get(
-                            i - ownedEventsLength - savedEventsLength - drivesForLength
-                    ).rideID,
-                    Toast.LENGTH_SHORT
-            ).show();
+            rideID = this.m_userModel.getRides().get(
+                    i - ownedEventsLength - savedEventsLength - drivesForLength
+            ).rideID;
+            eventName = this.m_userModel.getRides().get(
+                    i - ownedEventsLength - savedEventsLength - drivesForLength
+            ).eventName;
+
+            Intent switchToRideDetail = new Intent( this, RideDetailActivity.class );
+            switchToRideDetail.putExtra( RideDetailActivity.RIDE_ID_EXTRA, rideID );
+            switchToRideDetail.putExtra( RideDetailActivity.EVENT_NAME_EXTRA, eventName );
+            startActivity( switchToRideDetail );
 
         }
     }

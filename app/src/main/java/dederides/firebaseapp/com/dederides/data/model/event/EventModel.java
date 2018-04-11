@@ -239,6 +239,7 @@ public class EventModel {
     private class CancelRideRequestTransactionHandler implements Transaction.Handler {
 
         private String m_cancelingRiderUID;
+        String m_canceledRideID;
 
         CancelRideRequestTransactionHandler( String riderUID ) {
             this.m_cancelingRiderUID = riderUID;
@@ -249,8 +250,8 @@ public class EventModel {
 
             /* Local Variables */
             String queuedRiderUID;
-            String canceledRideID = null;
-            Map<String, Object> updates = new HashMap<>( 2);
+
+            m_canceledRideID = null;
 
             /* For each rider in queue */
             for (MutableData queueEntry: mutableData.getChildren()) {
@@ -260,22 +261,10 @@ public class EventModel {
                 if ( queuedRiderUID.equals( this.m_cancelingRiderUID ) ) {
 
                     /* Remove that ride from queue */
-                    canceledRideID = queueEntry.getKey();
-                    mutableData.child( canceledRideID ).setValue( null );
+                    m_canceledRideID = queueEntry.getKey();
+                    mutableData.child( m_canceledRideID ).setValue( null );
                     break;
                 }
-            }
-
-            /* If rider was in queue */
-            if ( canceledRideID != null ) {
-
-                /* Update database to remove ride */
-                updates.put( "/rides/" + canceledRideID, null );
-                updates.put( "/users/" + this.m_cancelingRiderUID + "/rides/" + canceledRideID,
-                             null
-                );
-
-                FirebaseDatabase.getInstance().getReference().updateChildren( updates );
             }
 
             return Transaction.success( mutableData );
@@ -284,6 +273,20 @@ public class EventModel {
         @Override
         public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
 
+            Map<String, Object> updates;
+
+            if ( m_canceledRideID != null ) {
+
+                updates = new HashMap<>( 2);
+
+                /* Update database to remove ride */
+                updates.put( "/rides/" + m_canceledRideID, null );
+                updates.put( "/users/" + this.m_cancelingRiderUID + "/rides/" + m_canceledRideID,
+                        null
+                );
+
+                FirebaseDatabase.getInstance().getReference().updateChildren( updates );
+            }
         }
     }
 
