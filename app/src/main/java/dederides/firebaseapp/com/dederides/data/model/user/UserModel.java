@@ -1,6 +1,9 @@
 package dederides.firebaseapp.com.dederides.data.model.user;
 
+import android.util.Log;
+
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -10,14 +13,17 @@ import com.google.firebase.database.ValueEventListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import dederides.firebaseapp.com.dederides.data.model.event.EventModel;
+
 public class UserModel {
 
     private UserModelUpdateHandler m_handler;
 
+    private FirebaseUser m_firebaseUser;
     private String m_displayName;
     private String m_uid;
 
-    private DatabaseReference m_ref = FirebaseDatabase.getInstance().getReference();
+    private static DatabaseReference m_ref = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference m_userRef;
 
     private ArrayList<OwnedEventEntry> m_ownedEvents;
@@ -35,6 +41,14 @@ public class UserModel {
         this.m_displayName = user.getDisplayName();
         this.m_uid = user.getUid();
 
+         /* Initialize database user root */
+        this.m_userRef = m_ref.child( "users" ).child( this.m_uid );
+
+        /* Add user to database if not present */
+        this.m_firebaseUser = user;
+        CreateUserInDatabaseIfAbsent createUser = new CreateUserInDatabaseIfAbsent( this );
+        m_userRef.child( "displayName" ).addListenerForSingleValueEvent( createUser );
+
         this.construct();
     }
 
@@ -46,17 +60,13 @@ public class UserModel {
         /* Initialize auth variables */
         this.m_uid = user_uid;
 
+        /* Initialize database user root */
+        this.m_userRef = m_ref.child( "users" ).child( this.m_uid );
+
         this.construct();
     }
 
     private void construct() {
-
-        /* Initialize database user root */
-        this.m_userRef = m_ref.child( "users" ).child( this.m_uid );
-
-        /* Add user to database if not present */
-        CreateUserInDatabaseIfAbsent createUser = new CreateUserInDatabaseIfAbsent( this );
-        m_userRef.child( "displayName" ).addListenerForSingleValueEvent( createUser );
 
         /* Initialize Database Populated Variables */
         this.m_ownedEvents = new ArrayList<>();
@@ -130,11 +140,24 @@ public class UserModel {
 
             if( userDisplayNameValue == null ) {
 
-                /* TODO: Add if not present */
+                UserModel.m_ref.child( "users" ).child( this.m_model.m_uid ).child( "displayName" )
+                        .setValue( this.m_model.m_displayName );
 
             } else {
                 this.m_model.m_displayName = userDisplayNameValue;
             }
+
+            /* Add facebook ID */
+            if( this.m_model.m_firebaseUser != null ) {
+                for (UserInfo info : this.m_model.m_firebaseUser.getProviderData()) {
+                    if( info.getProviderId().toLowerCase().contains( "facebook" ) ) {
+                        UserModel.m_ref.child( "users" ).child( this.m_model.m_uid )
+                                .child( "facebookUID" ).setValue( info.getUid() );
+                        break;
+                    }
+                }
+            }
+
         }
 
         @Override
