@@ -75,7 +75,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="dederides.firebaseapp.com.dederides.MainMenu" />
         </activity>
-        <activity android:name=".DriveActivity"></activity>
+
+        <activity android:name=".DriveActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="dederides.firebaseapp.com.dederides.MainMenu" />
+        </activity>
     </application>
 
 </manifest>
