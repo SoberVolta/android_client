@@ -23,6 +23,7 @@ import dederides.firebaseapp.com.dederides.data.model.event.QueueEntry;
 import dederides.firebaseapp.com.dederides.data.model.ride.RideModel;
 import dederides.firebaseapp.com.dederides.data.model.ride.RideModelUpdateHandler;
 import dederides.firebaseapp.com.dederides.data.model.user.DrivesEntry;
+import dederides.firebaseapp.com.dederides.data.model.user.DrivesForEntry;
 import dederides.firebaseapp.com.dederides.data.model.user.UserModel;
 import dederides.firebaseapp.com.dederides.data.model.user.UserModelUpdateHandler;
 
@@ -215,11 +216,26 @@ public class DriveActivity extends AppCompatActivity implements UserModelUpdateH
 
         } else {
 
-            Toast.makeText(
-                    this,
-                    "Resend Drive Offer",
-                    Toast.LENGTH_LONG
-            ).show();
+            /* Display confirmation dialog */
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Cancel Drive Offer?");
+            builder.setMessage("Are you sure you want to stop driving for "
+                    + this.m_eventModel.getName() + "?");
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /* Do nothing on cancel */
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                }
+            });
+            builder.setPositiveButton("Stop Driving", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    DriveActivity.this.m_eventModel.removeDriverFromEvent(
+                            DriveActivity.this.m_userModel.getUID()
+                    );
+                }
+            });
+            builder.create().show();
 
         }
 
@@ -240,6 +256,13 @@ public class DriveActivity extends AppCompatActivity implements UserModelUpdateH
     @Override
     public void userDrivesForUpdated() {
 
+        for (DrivesForEntry drivesForEntry : this.m_userModel.getDrivesFor()) {
+            if( drivesForEntry.eventID.equals( this.m_eventModel.getEventID() )) {
+                return;
+            }
+        }
+
+        onBackPressed();
     }
 
     @Override
