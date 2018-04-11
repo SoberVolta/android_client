@@ -2,27 +2,35 @@ package dederides.firebaseapp.com.dederides;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Locale;
 
 import dederides.firebaseapp.com.dederides.data.model.event.ActiveRidesEntry;
 import dederides.firebaseapp.com.dederides.data.model.event.EventModel;
 import dederides.firebaseapp.com.dederides.data.model.event.EventModelUpdateHandler;
 import dederides.firebaseapp.com.dederides.data.model.event.QueueEntry;
+import dederides.firebaseapp.com.dederides.data.model.ride.RideModel;
+import dederides.firebaseapp.com.dederides.data.model.ride.RideModelUpdateHandler;
 import dederides.firebaseapp.com.dederides.data.model.user.DrivesEntry;
 import dederides.firebaseapp.com.dederides.data.model.user.UserModel;
 import dederides.firebaseapp.com.dederides.data.model.user.UserModelUpdateHandler;
 
-public class DriveActivity extends AppCompatActivity implements UserModelUpdateHandler, EventModelUpdateHandler {
+public class DriveActivity extends AppCompatActivity implements UserModelUpdateHandler,
+        EventModelUpdateHandler, RideModelUpdateHandler {
 
     public static final String USER_UID_EXTRA = "user_uid_extra";
     public static final String EVENT_ID_EXTRA = "event_id_extra";
 
     private UserModel m_userModel;
     private EventModel m_eventModel;
+    private RideModel m_activeRide;
 
     private TextView lbl_eventName;
     private TextView lbl_eventLocation;
@@ -59,6 +67,7 @@ public class DriveActivity extends AppCompatActivity implements UserModelUpdateH
     private void updateButtons() {
 
         this.m_userIsInActiveDrive = false;
+        this.m_activeRide = null;
         this.btn_popQueue.setEnabled( false );
         this.btn_popQueue.setTextColor( Color.BLACK );
         this.btn_getRiderLocation.setEnabled( false );
@@ -70,6 +79,8 @@ public class DriveActivity extends AppCompatActivity implements UserModelUpdateH
             if( activeRideEntry.driverUID.equals( this.m_userModel.getUID() ) ) {
 
                 this.m_userIsInActiveDrive = true;
+                this.m_activeRide = new RideModel( activeRideEntry.rideID, this );
+
                 this.btn_popQueue.setEnabled( false );
                 this.btn_popQueue.setTextColor( Color.GRAY );
                 this.btn_popQueue.setText( "You Are Currently Driving Someone" );
@@ -114,6 +125,31 @@ public class DriveActivity extends AppCompatActivity implements UserModelUpdateH
 
     public void onGetRiderLocationClicked( View view ) {
 
+        if ( this.m_activeRide == null ) {
+            Toast.makeText(
+                    this,
+                    "Not In Current Drive",
+                    Toast.LENGTH_LONG
+            ).show();
+            return;
+        }
+
+        if ( this.m_activeRide.getLatitude() == null || this.m_activeRide.getLongitude() == null ) {
+
+            Toast.makeText(
+                    this,
+                    "Cannot Get Rider's Location",
+                    Toast.LENGTH_LONG
+            ).show();
+            return;
+        }
+
+        double lat = this.m_activeRide.getLatitude();
+        double lon = this.m_activeRide.getLongitude();
+
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                Uri.parse("http://maps.google.com/maps?daddr=" + lat + "," + lon ));
+        startActivity(intent);
     }
 
 
@@ -188,6 +224,38 @@ public class DriveActivity extends AppCompatActivity implements UserModelUpdateH
 
     @Override
     public void eventDeleted() {
+
+    }
+
+    /* Ride Model Update Handler *********************************************/
+
+    @Override
+    public void rideEventDidChange() {
+
+    }
+
+    @Override
+    public void rideRiderDidChange() {
+
+    }
+
+    @Override
+    public void rideDriverDidChange() {
+
+    }
+
+    @Override
+    public void rideStatusDidChange() {
+
+    }
+
+    @Override
+    public void rideLocationDidChange() {
+
+    }
+
+    @Override
+    public void rideWasRemoved() {
 
     }
 }
