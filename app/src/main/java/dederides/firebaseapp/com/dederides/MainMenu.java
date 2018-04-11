@@ -136,8 +136,18 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         } else if( i < ownedEventsLength + savedEventsLength + drivesForLength ) {
 
             eventID = this.m_userModel.getDrivesFor().get( i - ownedEventsLength - savedEventsLength ).eventID;
-            Toast.makeText(this, "Drives For: " + eventID, Toast.LENGTH_LONG).show();
 
+            Intent switchToDriveDetailActivity
+                    = new Intent( this, DriveActivity.class );
+            switchToDriveDetailActivity.putExtra(
+                    DriveActivity.USER_UID_EXTRA,
+                    this.m_userModel.getUID()
+            );
+            switchToDriveDetailActivity.putExtra(
+                    DriveActivity.EVENT_ID_EXTRA,
+                    eventID
+            );
+            startActivity( switchToDriveDetailActivity );
         }
     }
 

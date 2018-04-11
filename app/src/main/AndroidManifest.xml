@@ -70,12 +70,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="dederides.firebaseapp.com.dederides.EventDetailActivity" />
         </activity>
-
         <activity android:name=".CreateEventActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="dederides.firebaseapp.com.dederides.MainMenu" />
         </activity>
+        <activity android:name=".DriveActivity"></activity>
     </application>
 
 </manifest>
