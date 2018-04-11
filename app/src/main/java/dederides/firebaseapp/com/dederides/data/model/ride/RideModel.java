@@ -6,6 +6,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RideModel {
 
     private static DatabaseReference m_ref = FirebaseDatabase.getInstance().getReference();
@@ -81,6 +84,18 @@ public class RideModel {
 
     public Double getLongitude() {
         return m_longitude;
+    }
+
+    public void endActiveRide() {
+
+        Map<String, Object> updates = new HashMap<>( 4 );
+
+        updates.put( "/rides/" + this.m_rideID, null );
+        updates.put( "/events/" + this.m_eventID + "/activeRides/" + this.m_rideID, null );
+        updates.put( "/users/" + this.m_driverUID + "/drives/" + this.m_rideID, null );
+        updates.put( "/users/" + this.m_riderUID + "/rides/" + this.m_rideID, null );
+
+        RideModel.m_ref.updateChildren( updates );
     }
 
     /* Database Listeners ****************************************************/

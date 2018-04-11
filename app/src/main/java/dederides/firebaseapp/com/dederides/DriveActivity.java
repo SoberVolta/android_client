@@ -189,6 +189,41 @@ public class DriveActivity extends AppCompatActivity implements UserModelUpdateH
         startActivity(intent);
     }
 
+    public void onNegateClick( View view ) {
+
+        if( this.m_activeRide != null ) {
+
+            /* Display confirmation dialog */
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("End Current Drive");
+            builder.setMessage("Are you sure the current drive is complete?" );
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /* Do nothing on cancel */
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                }
+            });
+            builder.setPositiveButton("End Drive", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    DriveActivity.this.m_activeRide.endActiveRide();
+
+                }
+            });
+            builder.create().show();
+
+        } else {
+
+            Toast.makeText(
+                    this,
+                    "Resend Drive Offer",
+                    Toast.LENGTH_LONG
+            ).show();
+
+        }
+
+    }
 
     /* User Model Update Handler *********************************************/
 
