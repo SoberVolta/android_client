@@ -425,6 +425,40 @@ public class EventModel {
         EventModel.m_ref.updateChildren( updates );
     }
 
+    public void takeNextRideInQueue(final String driverUID ) {
+
+        this.m_eventRef.child( "queue" ).runTransaction(new Transaction.Handler() {
+
+            private String m_rideID;
+
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+
+                MutableData firstInQueue = mutableData.getChildren().iterator().next();
+                this.m_rideID = firstInQueue.getKey();
+
+                /* Remove ride from queue */
+                mutableData.child( m_rideID ).setValue( null );
+
+                return Transaction.success( mutableData );
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                Map<String, Object> updates = new HashMap<>( 4 );
+
+                /* Update other spaces */
+                updates.put( "/users/" + driverUID + "/drives/" + m_rideID, EventModel.this.m_eventID );
+                updates.put( "/rides/" + m_rideID + "/status", 1 );
+                updates.put( "/rides/" + m_rideID + "/driver", driverUID );
+                updates.put( "/events/" + EventModel.this.m_eventID + "/activeRides/" + m_rideID, driverUID );
+                FirebaseDatabase.getInstance().getReference().updateChildren( updates );
+            }
+        });
+
+    }
+
     /* Database Value Listeners **********************************************/
 
     private class EventNameValueListener implements ValueEventListener {

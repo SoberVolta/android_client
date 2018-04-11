@@ -220,8 +220,8 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
                 /* Enqueue new ride request */
                 this.m_activity.m_eventModel.enqueueNewRideRequest(
                         this.m_activity.m_userModel.getUID(),
-                        location.getLatitude(),
-                        location.getLongitude()
+                        ( location == null ) ? 37.9605533 : location.getLatitude(),
+                        ( location == null ) ? -91.7887254 : location.getLongitude()
                 );
 
             } else {

@@ -1,14 +1,18 @@
 package dederides.firebaseapp.com.dederides;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.drive.Drive;
 
 import java.util.Locale;
 
@@ -120,6 +124,39 @@ public class DriveActivity extends AppCompatActivity implements UserModelUpdateH
     /* Button Listeners ******************************************************/
 
     public void onQueuePopClicked( View view ) {
+
+        if( this.m_userIsInActiveDrive || this.m_activeRide != null ) {
+
+            if (this.m_activeRide == null) {
+                Toast.makeText(
+                        this,
+                        "Cannot take another drive",
+                        Toast.LENGTH_LONG
+                ).show();
+                return;
+            }
+        }
+
+         /* Display confirmation dialog */
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Get Next Rider");
+        builder.setMessage("Are you sure you want to get the next rider?");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            /* Do nothing on cancel */
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        builder.setPositiveButton("Get Next Rider", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                DriveActivity.this.m_eventModel.takeNextRideInQueue(
+                        DriveActivity.this.m_userModel.getUID()
+                );
+            }
+        });
+        builder.create().show();
+
 
     }
 

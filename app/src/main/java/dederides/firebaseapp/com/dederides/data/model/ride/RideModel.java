@@ -95,7 +95,11 @@ public class RideModel {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            this.m_model.m_eventID = dataSnapshot.getValue( String.class );
+            try {
+                this.m_model.m_eventID = dataSnapshot.getValue( String.class );
+            } catch ( Exception e ) {
+                this.m_model.m_eventID = null;
+            }
             this.m_model.m_handler.rideEventDidChange();
         }
 
@@ -116,7 +120,11 @@ public class RideModel {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            this.m_model.m_riderUID = dataSnapshot.getValue( String.class );
+            try {
+                this.m_model.m_riderUID = dataSnapshot.getValue( String.class );
+            } catch ( Exception e ) {
+                this.m_model.m_riderUID = null;
+            }
             this.m_model.m_handler.rideRiderDidChange();
         }
 
@@ -137,7 +145,11 @@ public class RideModel {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            this.m_model.m_driverUID = dataSnapshot.getValue( String.class );
+            try {
+                this.m_model.m_driverUID = dataSnapshot.getValue( String.class );
+            } catch ( Exception e ) {
+                this.m_model.m_driverUID = null;
+            }
             this.m_model.m_handler.rideDriverDidChange();
         }
 
@@ -158,7 +170,11 @@ public class RideModel {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            this.m_model.m_status = dataSnapshot.getValue( Integer.class );
+            try {
+                this.m_model.m_status = dataSnapshot.getValue(Integer.class);
+            } catch ( Exception e ) {
+                this.m_model.m_status = 0;
+            }
             this.m_model.m_handler.rideStatusDidChange();
         }
 
@@ -179,7 +195,11 @@ public class RideModel {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            this.m_model.m_latitude = dataSnapshot.getValue( Double.class );
+            try {
+                this.m_model.m_latitude = dataSnapshot.getValue( Double.class );
+            } catch ( Exception e ) {
+                this.m_model.m_latitude = null;
+            }
             this.m_model.m_handler.rideLocationDidChange();
         }
 
@@ -200,7 +220,11 @@ public class RideModel {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            this.m_model.m_longitude = dataSnapshot.getValue( Double.class );
+            try {
+                this.m_model.m_longitude = dataSnapshot.getValue( Double.class );
+            } catch ( Exception e ) {
+                this.m_model.m_longitude = null;
+            }
             this.m_model.m_handler.rideLocationDidChange();
         }
 
