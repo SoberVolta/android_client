@@ -95,7 +95,7 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
 
     @Override
     public void userRidesUpdated() {
-
+        this.m_listViewAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -111,6 +111,7 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         int ownedEventsLength = this.m_userModel.getOwnedEvents().size();
         int savedEventsLength = this.m_userModel.getSavedEvents().size();
         int drivesForLength = this.m_userModel.getDrivesFor().size();
+        int ridesLength = this.m_userModel.getRides().size();
         String eventID;
 
         if( i < ownedEventsLength ) {
@@ -148,6 +149,17 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
                     eventID
             );
             startActivity( switchToDriveDetailActivity );
+
+        } else if ( i < ownedEventsLength + savedEventsLength + drivesForLength + ridesLength ) {
+
+            Toast.makeText(
+                    this,
+                    "RideID: " + m_userModel.getRides().get(
+                            i - ownedEventsLength - savedEventsLength - drivesForLength
+                    ).rideID,
+                    Toast.LENGTH_SHORT
+            ).show();
+
         }
     }
 
@@ -169,7 +181,8 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
         public int getCount() {
             return  this.m_mainMenu.m_userModel.getOwnedEvents().size() +
                     this.m_mainMenu.m_userModel.getSavedEvents().size() +
-                    this.m_mainMenu.m_userModel.getDrivesFor().size();
+                    this.m_mainMenu.m_userModel.getDrivesFor().size() +
+                    this.m_mainMenu.m_userModel.getRides().size();
         }
 
         @Override
@@ -190,6 +203,7 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
             int ownedEventsLength = this.m_mainMenu.m_userModel.getOwnedEvents().size();
             int savedEventsLength = this.m_mainMenu.m_userModel.getSavedEvents().size();
             int drivesForLength = this.m_mainMenu.m_userModel.getDrivesFor().size();
+            int ridesLength = this.m_mainMenu.m_userModel.getRides().size();
 
             LayoutInflater layoutInflater = LayoutInflater.from(this.m_context);
             row = layoutInflater.inflate(                                               // TODO: Fix
@@ -220,6 +234,15 @@ public class MainMenu extends AppCompatActivity implements UserModelUpdateHandle
                 lbl_rowType.setTextColor( 0xFFFF0000 );
 
                 lbl_rowTitle.setText(this.m_mainMenu.m_userModel.getDrivesFor().get(i - ownedEventsLength - savedEventsLength).eventName);
+
+            } else if ( i < ( ownedEventsLength + savedEventsLength + drivesForLength + ridesLength )) {
+
+                lbl_rowType.setText( "In a Ride" );
+                lbl_rowType.setTextColor( 0xFF228b22 );
+
+                lbl_rowTitle.setText(this.m_mainMenu.m_userModel.getRides().get(
+                        i - ownedEventsLength - savedEventsLength - drivesForLength ).eventName
+                );
 
             }
 

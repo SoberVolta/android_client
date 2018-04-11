@@ -217,12 +217,23 @@ public class EventDetailActivity extends AppCompatActivity implements UserModelU
             if (locationManager != null) {
                 location = locationManager.getLastKnownLocation( LocationManager.GPS_PROVIDER );
 
+                if( location != null ) {
                 /* Enqueue new ride request */
-                this.m_activity.m_eventModel.enqueueNewRideRequest(
-                        this.m_activity.m_userModel.getUID(),
-                        ( location == null ) ? 37.9605533 : location.getLatitude(),
-                        ( location == null ) ? -91.7887254 : location.getLongitude()
-                );
+                    this.m_activity.m_eventModel.enqueueNewRideRequest(
+                            this.m_activity.m_userModel.getUID(),
+                            location.getLatitude(),
+                            location.getLongitude()
+                    );
+                } else {
+
+                    /* Alert user of error */
+                    Toast.makeText(
+                            EventDetailActivity.this,
+                            "Unable to request ride. Location Not Available.",
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                }
 
             } else {
 
