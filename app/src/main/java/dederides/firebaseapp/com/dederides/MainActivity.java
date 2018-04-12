@@ -10,6 +10,7 @@ import com.facebook.AccessToken;
 import com.facebook.FacebookException;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import dederides.firebaseapp.com.dederides.authentication.FacebookAuthHandler;
 import dederides.firebaseapp.com.dederides.authentication.FacebookAuthModel;
@@ -53,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements
         if( this.facebookAuth.configureFacebookLoginButton( fb_login_button ) ) {
             this.onValidAuthentication( facebookAuth.getAccessToken() );
         }
-
     }
 
     @Override

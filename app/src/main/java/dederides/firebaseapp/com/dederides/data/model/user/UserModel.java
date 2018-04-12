@@ -9,13 +9,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-import dederides.firebaseapp.com.dederides.data.model.event.EventModel;
-
 public class UserModel {
+
+    private static final String TAG = "UserModel";
 
     private UserModelUpdateHandler m_handler;
 
@@ -31,6 +31,8 @@ public class UserModel {
     private ArrayList<DrivesForEntry> m_drivesFor;
     private ArrayList<RidesEntry> m_rides;
     private ArrayList<DrivesEntry> m_drives;
+
+    private ArrayList<String> m_notificationSubscriptions;
 
     public UserModel( FirebaseUser user, UserModelUpdateHandler handler ) {
 
@@ -75,6 +77,8 @@ public class UserModel {
         this.m_rides = new ArrayList<>();
         this.m_drives = new ArrayList<>();
 
+        this.m_notificationSubscriptions = new ArrayList<>();
+
         /* Add Event Listeners */
         m_userRef.child( "displayName" ).addValueEventListener(
                 new DisplayNameListener()
@@ -94,6 +98,21 @@ public class UserModel {
         m_userRef.child( "drives" ).addValueEventListener(
                 new DrivesEventListener( this )
         );
+    }
+
+    private void subscribeToNotifications(String eventID ) {
+
+        Log.d( TAG, "Subscribing to events for: " + eventID );
+
+        this.m_notificationSubscriptions.add( eventID );
+        FirebaseMessaging.getInstance().subscribeToTopic( eventID );
+    }
+
+    private void unsubscribeFromAllNotifications() {
+        for (String notificationTopic : this.m_notificationSubscriptions) {
+            Log.d( TAG, "Unsubscribing from " + notificationTopic + " notifications." );
+            FirebaseMessaging.getInstance().unsubscribeFromTopic( notificationTopic );
+        }
     }
 
     public String getDisplayName() {
@@ -260,6 +279,7 @@ public class UserModel {
         public void onDataChange(DataSnapshot dataSnapshot) {
 
             this.m_model.m_drivesFor.clear();
+            this.m_model.unsubscribeFromAllNotifications();
 
             /* Add all entries from data base */
             for (DataSnapshot drivesForEvent: dataSnapshot.getChildren()) {
@@ -267,6 +287,9 @@ public class UserModel {
                         drivesForEvent.getKey(),
                         drivesForEvent.getValue( String.class )
                 ));
+
+                /* Get notifications */
+                this.m_model.subscribeToNotifications( drivesForEvent.getKey() );
             }
 
             /* Alert Handler */
